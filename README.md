@@ -10,7 +10,7 @@ This application is neither affiliated with Beem Development nor Aegis Authentic
 
 ## Requirements
 
-- **Ruby:** >= 2.4 or >= 3.0, no external gems needed
+- **Ruby:** >= 2.5 or >= 3.0, no external gems needed
 - **OS:** Either Windows, macOS, or Linux
 
 ## Example
@@ -128,7 +128,7 @@ You should get the following plaintext output.
 ## Testing
 
 ```bash
-# The test suite requires Ruby 2.4 or newer
+# The test suite requires Ruby 2.5 or newer
 gem install bundler
 bundle install
 bundle exec rspec
