@@ -65,9 +65,9 @@ end
 # Extract valid password slots from JSON Hash `obj`.
 # Valid password slots match the Aegis Authenticator password slot schema.
 #
-# @param [String] obj JSON Hash
+# @param [Hash] obj JSON Hash
 #
-# @return [Hash] Parameters needed to decrypt the cipher text
+# @return [Array] Array of Hash where each Hash may contain parameters needed to derive the master key
 #
 def extract_password_slots(obj)
   assert_is_hash(obj)
@@ -95,9 +95,9 @@ end
 #
 # Extract cipher text from `obj` JSON Hash.
 #
-# @param [String] obj JSON Hash
+# @param [Hash] obj JSON Hash
 #
-# @return [Hash] Cipher text as bytes
+# @return [String] Cipher text as bytes
 #
 def get_db(obj)
   assert_is_hash(obj)
@@ -109,7 +109,7 @@ end
 #
 # Extract AES-GCM initialization vector and AES-GCM authentication tag from `obj` JSON Hash.
 #
-# @param [String] obj JSON Hash
+# @param [Hash] obj JSON Hash
 #
 # @return [Hash] AES-GCM initialization vector and authentication tag
 #
@@ -129,7 +129,7 @@ end
 # Derive the vault master key by trying out `password`
 # on all `password_slots` until one succeeds.
 #
-# @param [String] password Backup file password in plaintext
+# @param [String] password Backup file password as plaintext
 # @param [Array] password_slots Array of Hash where each Hash may contain parameters needed to derive the master key
 #
 # @return [String] Derived master key as bytes
@@ -180,7 +180,7 @@ end
 #
 # @param [String] prompt Message prompt to display
 #
-# @return [String] Password
+# @return [String] Password as plaintext
 #
 def getpass(prompt)
   $stderr.write prompt # Display prompt without adding prompt to stdout.
