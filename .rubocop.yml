@@ -19,3 +19,5 @@ Style/FrozenStringLiteralComment:
     Enabled: false
 Style/HashSyntax:
     Enabled: false
+Style/RedundantFileExtensionInRequire:
+    Enabled: false

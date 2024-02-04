@@ -17,7 +17,7 @@
 require 'base64'
 require 'io/console'
 require 'json'
-require 'openssl'
+require 'openssl.rb'
 
 ENCRYPTION_CIPHER = 'aes-256-gcm'.freeze
 
