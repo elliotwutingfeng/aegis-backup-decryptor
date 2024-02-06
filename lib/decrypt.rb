@@ -75,14 +75,14 @@ def extract_password_slots(obj)
   terminate 'Invalid vault file. No valid password slots found.' unless slots.is_a? Array
 
   password_slots = slots.select do |slot|
-    return false if slot.drill(:type) != 1
-    return false unless slot.drill(:key).is_a? String
-    return false unless slot.drill(:key_params, :nonce).is_a? String
-    return false unless slot.drill(:key_params, :tag).is_a? String
-    return false unless slot.drill(:n).is_a? Integer
-    return false unless slot.drill(:r).is_a? Integer
-    return false unless slot.drill(:p).is_a? Integer
-    return false unless slot.drill(:salt).is_a? String
+    next if slot.drill(:type) != 1
+    next unless slot.drill(:key).is_a? String
+    next unless slot.drill(:key_params, :nonce).is_a? String
+    next unless slot.drill(:key_params, :tag).is_a? String
+    next unless slot.drill(:n).is_a? Integer
+    next unless slot.drill(:r).is_a? Integer
+    next unless slot.drill(:p).is_a? Integer
+    next unless slot.drill(:salt).is_a? String
 
     true
   end
