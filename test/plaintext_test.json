@@ -1,32 +1,3 @@
-# Aegis Backup Decryptor
-
-[![Ruby](https://img.shields.io/badge/Ruby-CC342D?style=for-the-badge&logo=ruby&logoColor=white)](https://ruby-lang.org)
-[![Coveralls](https://img.shields.io/coverallsCoverage/github/elliotwutingfeng/aegis-backup-decryptor?logo=coveralls&style=for-the-badge)](https://coveralls.io/github/elliotwutingfeng/aegis-backup-decryptor?branch=main)
-[![GitHub license](https://img.shields.io/badge/LICENSE-GPLv3-GREEN?style=for-the-badge)](LICENSE)
-
-CLI tool to decrypt backup files exported from the [Aegis Authenticator app](https://getaegis.app).
-
-This application is neither affiliated with Beem Development nor Aegis Authenticator.
-
-## Requirements
-
-- **Ruby:** 2.5+/3.0+, no external gems needed
-- **OS:** Either Windows, macOS, or Linux
-
-## Example
-
-**File:** `test/encrypted_test.json`
-
-**Password:** `test`
-
-```bash
-# Enter the above password when prompted
-ruby lib/decrypt.rb test/encrypted_test.json
-```
-
-You should get the following plaintext output.
-
-```json
 {
     "version": 1,
     "entries": [
@@ -123,34 +94,3 @@ You should get the following plaintext output.
         }
     ]
 }
-```
-
-### Pretty output
-
-You can also pretty print the plaintext output as a CSV-like String padded with spaces by [piping](https://en.wikipedia.org/wiki/Pipeline_(Unix)) the output to [lib/pretty.rb](lib/pretty.rb).
-
-```bash
-ruby lib/decrypt.rb test/encrypted_test.json | ruby lib/pretty.rb
-```
-
-Output
-
-```csv
-type   uuid                                  name      issuer      icon  info.secret                 info.algo  info.digits  info.period
-totp   3ae6f1ad-2e65-4ed2-a953-1ec0dff2386d  Mason     Deno              4SJHB4GSD43FZBAI7C2HLRJGPQ  SHA1       6            30
-totp   84b55971-a3d2-4173-a5bb-0aea113dbc17  James     SPDX              5OM4WOOGPLQEF6UGN3CPEOOLWU  SHA256     7            20
-totp   3deaff2e-f181-4837-80e1-fdf0c54e9363  Elijah    Airbnb            7ELGJSGXNCCTV3O6LKJWYFV2RA  SHA512     8            50
-hotp   0a8c0571-ff6f-4b02-aa4b-50553b4fb4fe  James     Issuu             YOOMIXWS5GN6RTBPUFFWKTW5M4  SHA1       6
-hotp   03e572f2-8ebd-44b0-a57e-e958af74815d  Benjamin  Air Canada        KUVJJOM753IHTNDSZVCNKL7GII  SHA256     7
-hotp   b25f8815-007f-40f7-a700-ce058ac05435  Mason     WWE               5VAML3X35THCEBVRLV24CGBKOY  SHA512     8
-steam  5b11ae3b-6fc3-4d46-8ca7-cf0aea7de920  Sophia    Boeing            JRZCL47CMXVOQMNPZR2F7J4RGI  SHA1       5            30
-```
-
-## Testing
-
-```bash
-# The test suite requires Ruby 2.5 or newer
-gem install bundler
-bundle install
-bundle exec rspec
-```
