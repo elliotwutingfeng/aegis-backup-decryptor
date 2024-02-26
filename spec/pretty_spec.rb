@@ -17,7 +17,7 @@
 require 'spec_helper'
 require 'pretty'
 
-describe 'pretty' do
+describe 'beautify' do
   it 'Pretty prints plain text vault as a CSV-like String padded with spaces' do
     expect(beautify(entries_to_csv(File.read('test/plaintext_test.json',
                                              :encoding => 'utf-8')))).to eq File.read('test/pretty_test.txt',
