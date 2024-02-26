@@ -189,7 +189,17 @@ def getpass(prompt)
   password
 end
 
-def main
+#
+# Decrypt a vault file.
+#
+# Accept vault filename as a command-line argument, and decrypt it with password from user input.
+# If successful, return plaintext vault data as JSON String.
+#
+# @param [String] filename Vault file to decrypt
+#
+# @return [String] Plaintext vault as JSON String
+#
+def decrypt_vault
   terminate 'Usage: decrypt.rb <filename>' if ARGV.length != 1
 
   obj = parse_json File.read(ARGV[0], :encoding => 'utf-8')
@@ -201,8 +211,11 @@ def main
   master_key = derive_master_key(password, password_slots)
   plain_text = decrypt_ciphertext(cipher_text, master_key, iv, auth_tag)
   parse_json(plain_text) # Ensure plain_text is valid JSON.
+  plain_text
+end
 
-  $stdout.write plain_text
+def main
+  $stdout.write decrypt_vault
 end
 
 main if __FILE__ == $PROGRAM_NAME

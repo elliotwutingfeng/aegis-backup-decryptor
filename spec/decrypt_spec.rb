@@ -111,6 +111,8 @@ describe 'main' do
     main
     obj = JSON.parse(output, :symbolize_names => true)
     expect(obj[:entries].length).to eq 7
+    expected_plaintext_vault = File.read('test/plaintext_test.json', :encoding => 'utf-8')
+    expect(output).to eq expected_plaintext_vault
   end
   it 'Wrong password -> Decryption failure' do
     ARGV.replace ['test/encrypted_test.json']
