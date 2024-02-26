@@ -200,7 +200,7 @@ end
 # @return [String] Plaintext vault as JSON String
 #
 def decrypt_vault
-  terminate 'Usage: decrypt.rb <filename>' if ARGV.length != 1
+  terminate "Usage: #{$PROGRAM_NAME} <filename>" if ARGV.length != 1
 
   obj = parse_json File.read(ARGV[0], :encoding => 'utf-8')
   password_slots = extract_password_slots(obj)
