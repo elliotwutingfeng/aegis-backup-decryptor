@@ -201,8 +201,11 @@ end
 #
 def decrypt_vault
   terminate "Usage: #{$PROGRAM_NAME} <filename>" if ARGV.length != 1
-
-  obj = parse_json File.read(ARGV[0], :encoding => 'utf-8')
+  begin
+    obj = parse_json File.read(ARGV[0], :encoding => 'utf-8')
+  rescue Errno::ENOENT => e
+    terminate e.to_s
+  end
   password_slots = extract_password_slots(obj)
   cipher_text = get_db(obj)
   iv, auth_tag = get_vault_params(obj).values_at(:iv, :auth_tag)

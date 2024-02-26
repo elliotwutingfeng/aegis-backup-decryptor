@@ -121,6 +121,15 @@ describe 'main' do
       end
     end
   end
+  it 'No such file or directory -> SystemExit' do
+    ARGV.replace ['test/encrypted_test_that_does_not_exist.json']
+    allow($stdin).to receive(:noecho) { '' }
+    silence do
+      expect { main }.to raise_error(SystemExit) do |error|
+        expect(error.status).to eq(1)
+      end
+    end
+  end
   it 'Accepts exactly 1 argument' do
     test_vectors = [[], ['test/encrypted_test.json', 'another'], ['test/encrypted_test.json', 'yet another']]
     silence do
