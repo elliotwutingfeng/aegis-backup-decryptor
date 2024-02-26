@@ -109,8 +109,6 @@ describe 'main' do
     expect($stderr).to receive(:puts)
     expect($stdout).to receive(:write) { |arg| output = arg }
     main
-    obj = JSON.parse(output, :symbolize_names => true)
-    expect(obj[:entries].length).to eq 7
     expected_plaintext_vault = File.read('test/plaintext_test.json', :encoding => 'utf-8')
     expect(output).to eq expected_plaintext_vault
   end
