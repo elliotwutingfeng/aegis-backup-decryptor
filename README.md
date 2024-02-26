@@ -127,23 +127,24 @@ You should get the following plaintext output.
 
 ### Pretty output
 
-You can also pretty print the plaintext output as a CSV-like String padded with spaces by [piping](https://en.wikipedia.org/wiki/Pipeline_(Unix)) the output to [lib/pretty.rb](lib/pretty.rb).
+You can also pretty print the plaintext output as a CSV-like String padded with spaces by running [lib/pretty.rb](lib/pretty.rb) instead.
 
 ```bash
-ruby lib/decrypt.rb test/encrypted_test.json | ruby lib/pretty.rb
+# Enter the above password when prompted
+ruby lib/pretty.rb test/encrypted_test.json
 ```
 
 Output
 
 ```csv
-type   uuid                                  name      issuer      icon  info.secret                 info.algo  info.digits  info.period
-totp   3ae6f1ad-2e65-4ed2-a953-1ec0dff2386d  Mason     Deno              4SJHB4GSD43FZBAI7C2HLRJGPQ  SHA1       6            30
-totp   84b55971-a3d2-4173-a5bb-0aea113dbc17  James     SPDX              5OM4WOOGPLQEF6UGN3CPEOOLWU  SHA256     7            20
-totp   3deaff2e-f181-4837-80e1-fdf0c54e9363  Elijah    Airbnb            7ELGJSGXNCCTV3O6LKJWYFV2RA  SHA512     8            50
-hotp   0a8c0571-ff6f-4b02-aa4b-50553b4fb4fe  James     Issuu             YOOMIXWS5GN6RTBPUFFWKTW5M4  SHA1       6
-hotp   03e572f2-8ebd-44b0-a57e-e958af74815d  Benjamin  Air Canada        KUVJJOM753IHTNDSZVCNKL7GII  SHA256     7
-hotp   b25f8815-007f-40f7-a700-ce058ac05435  Mason     WWE               5VAML3X35THCEBVRLV24CGBKOY  SHA512     8
-steam  5b11ae3b-6fc3-4d46-8ca7-cf0aea7de920  Sophia    Boeing            JRZCL47CMXVOQMNPZR2F7J4RGI  SHA1       5            30
+uuid                                  type   name      issuer      info.secret                 info.period  info.digits  info.counter  info.algo  icon
+3ae6f1ad-2e65-4ed2-a953-1ec0dff2386d  totp   Mason     Deno        4SJHB4GSD43FZBAI7C2HLRJGPQ  30           6                          SHA1
+84b55971-a3d2-4173-a5bb-0aea113dbc17  totp   James     SPDX        5OM4WOOGPLQEF6UGN3CPEOOLWU  20           7                          SHA256
+3deaff2e-f181-4837-80e1-fdf0c54e9363  totp   Elijah    Airbnb      7ELGJSGXNCCTV3O6LKJWYFV2RA  50           8                          SHA512
+0a8c0571-ff6f-4b02-aa4b-50553b4fb4fe  hotp   James     Issuu       YOOMIXWS5GN6RTBPUFFWKTW5M4               6            1             SHA1
+03e572f2-8ebd-44b0-a57e-e958af74815d  hotp   Benjamin  Air Canada  KUVJJOM753IHTNDSZVCNKL7GII               7            50            SHA256
+b25f8815-007f-40f7-a700-ce058ac05435  hotp   Mason     WWE         5VAML3X35THCEBVRLV24CGBKOY               8            10300         SHA512
+5b11ae3b-6fc3-4d46-8ca7-cf0aea7de920  steam  Sophia    Boeing      JRZCL47CMXVOQMNPZR2F7J4RGI  30           5                          SHA1
 ```
 
 ## Testing

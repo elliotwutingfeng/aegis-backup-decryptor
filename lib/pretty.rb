@@ -26,8 +26,8 @@ require_relative 'decrypt'
 # @return [Hash] Flattened JSON data where keys are concatenated
 #  with dots to represent nested structure
 #
-def flatten_json(json_data, parent_key)
-  json_data.each_with_object({}) do |(key, value), hash|
+def flatten_json(balanced_json_data, parent_key)
+  balanced_json_data.each_with_object({}) do |(key, value), hash|
     new_key = parent_key.empty? ? key.to_sym : :"#{parent_key}.#{key}"
     if value.is_a?(Hash)
       hash.merge!(flatten_json(value, new_key))
@@ -38,16 +38,16 @@ def flatten_json(json_data, parent_key)
 end
 
 #
-# Convert JSON array under :entries key of JSON string plain_text to CSV String
+# Convert JSON array under :entries key of JSON String plain_text to CSV String
 #
 # @param [String] plain_text JSON String
 #
 # @return [String] CSV String
 #
 def entries_to_csv(plain_text)
-  json_data = parse_json(plain_text)[:entries]
-  flattened_data = json_data.map { |record| flatten_json(record, '') }
-  headers = flattened_data.first.keys
+  flattened_data = parse_json(plain_text)[:entries].map { |record| flatten_json(record, '') }
+  # In context of this application, the vault data looks more readable in descending alphabetical order.
+  headers = flattened_data.flat_map(&:keys).uniq.sort { |a, b| b <=> a }
 
   CSV.generate do |csv|
     csv << headers
@@ -78,9 +78,10 @@ def beautify(raw_csv)
     row.each_with_index do |cell, index|
       output << cell.to_s.ljust(column_widths[index] + 2) # Pad with 2 spaces.
     end
+    output.rstrip!
     output << "\n"
   end
   output
 end
 
-print beautify entries_to_csv($stdin.read) if __FILE__ == $PROGRAM_NAME
+$stdout.write beautify entries_to_csv decrypt_vault if __FILE__ == $PROGRAM_NAME

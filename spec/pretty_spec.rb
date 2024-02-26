@@ -19,8 +19,110 @@ require 'pretty'
 
 describe 'pretty' do
   it 'Pretty prints plain text vault as a CSV-like String padded with spaces' do
-    expected_pretty_vault = File.read('test/pretty_test.txt', :encoding => 'utf-8')
     expect(beautify(entries_to_csv(File.read('test/plaintext_test.json',
-                                             :encoding => 'utf-8')))).to eq expected_pretty_vault
+                                             :encoding => 'utf-8')))).to eq File.read('test/pretty_test.txt',
+                                                                                      :encoding => 'utf-8')
+  end
+end
+
+balanced_json_data = { :entries => [
+  {
+    :string1 => 'a_1',
+    :nil1 => nil,
+    :object1 => {
+      :innerstring1 => 'a_1_1',
+      :innerstring2 => 'a_1_2',
+      :innerint1 => 6
+    }
+  },
+  {
+    :string1 => 'b_1',
+    :nil1 => nil,
+    :object1 => {
+      :innerstring1 => 'b_1_1',
+      :innerstring2 => 'b_1_2',
+      :innerint1 => 6
+    }
+  }
+] }
+
+# Unbalanced JSON is JSON with :entries array where an element has fields that subsequent elements do not and vice versa
+unbalanced_json_data = { :entries => [
+  {
+    :string1 => 'a_1',
+    :string3 => 'a_3',
+    :nil1 => nil,
+    :object1 => {
+      :innerstring1 => 'a_1_1',
+      :innerstring2 => 'a_1_2',
+      :innerint1 => 0xa
+    }
+  },
+  {
+    :string1 => 'b_1',
+    :string2 => 'b_2',
+    :nil1 => nil,
+    :nil2 => nil,
+    :object1 => {
+      :innerstring1 => 'b_1_1',
+      :innerstring2 => 'b_1_2',
+      :innerstring3 => 'b_1_3',
+      :innerint1 => 0xb,
+      :innerint2 => 0xbb
+    }
+  }
+] }
+
+describe 'flatten_json' do
+  it 'No op for empty Hash' do
+    expect(flatten_json({}, '')).to eq({})
+  end
+
+  it 'Flattens array where all elements have the exact same fields' do
+    flattened_data = balanced_json_data[:entries].map { |record| flatten_json(record, '') }
+    expect(flattened_data).to eq [{ :nil1 => nil,
+                                    :'object1.innerint1' => 6,
+                                    :'object1.innerstring1' => 'a_1_1',
+                                    :'object1.innerstring2' => 'a_1_2',
+                                    :string1 => 'a_1' },
+                                  { :nil1 => nil,
+                                    :'object1.innerint1' => 6,
+                                    :'object1.innerstring1' => 'b_1_1',
+                                    :'object1.innerstring2' => 'b_1_2',
+                                    :string1 => 'b_1' }]
+  end
+
+  it 'Flattens array where an element has fields that subsequent elements do not and vice versa' do
+    flattened_data = unbalanced_json_data[:entries].map { |record| flatten_json(record, '') }
+    expect(flattened_data).to eq [{ :nil1 => nil,
+                                    :'object1.innerint1' => 0xa,
+                                    :'object1.innerstring1' => 'a_1_1',
+                                    :'object1.innerstring2' => 'a_1_2',
+                                    :string1 => 'a_1', :string3 => 'a_3' },
+                                  { :nil1 => nil,
+                                    :nil2 => nil,
+                                    :'object1.innerint1' => 0xb,
+                                    :'object1.innerint2' => 0xbb,
+                                    :'object1.innerstring1' => 'b_1_1',
+                                    :'object1.innerstring2' => 'b_1_2',
+                                    :'object1.innerstring3' => 'b_1_3',
+                                    :string1 => 'b_1', :string2 => 'b_2' }]
+  end
+end
+
+describe 'entries_to_csv' do
+  it 'Flattens balanced JSON to csv correctly' do
+    flattened_csv = entries_to_csv balanced_json_data.to_json(:encoding => 'utf-8')
+    expect(flattened_csv).to eq "string1,object1.innerstring2,object1.innerstring1,object1.innerint1,nil1\n" \
+                                "a_1,a_1_2,a_1_1,6,\n" \
+                                "b_1,b_1_2,b_1_1,6,\n"
+  end
+
+  it 'Flattens unbalanced JSON to csv correctly' do
+    flattened_csv = entries_to_csv unbalanced_json_data.to_json(:encoding => 'utf-8')
+    expect(flattened_csv).to eq 'string3,string2,string1,object1.innerstring3,object1.innerstring2,' \
+                                "object1.innerstring1,object1.innerint2,object1.innerint1,nil2,nil1\n" \
+                                "a_3,,a_1,,a_1_2,a_1_1,,10,,\n" \
+                                ",b_2,b_1,b_1_3,b_1_2,b_1_1,187,11,,\n"
   end
 end
