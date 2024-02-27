@@ -18,6 +18,9 @@ require 'base64'
 require 'io/console'
 require 'json'
 require 'openssl'
+require 'optparse'
+
+require_relative 'pretty'
 
 ENCRYPTION_CIPHER = 'aes-256-gcm'.freeze
 
@@ -138,8 +141,8 @@ def derive_master_key(password, password_slots)
   password_slots.each do |slot|
     decipher = OpenSSL::Cipher.new ENCRYPTION_CIPHER
     decipher.decrypt
-    decipher.key = OpenSSL::KDF.scrypt(password, :salt => [slot[:salt]].pack('H*'), :N => slot[:n],
-                                                 :r => slot[:r], :p => slot[:p], :length => 32)
+    decipher.key = OpenSSL::KDF.scrypt(password, :salt => [slot[:salt]].pack('H*'), :N => slot[:n], :r => slot[:r],
+                                                 :p => slot[:p], :length => 32)
     decipher.iv = [slot.drill(:key_params, :nonce)].pack 'H*'
     decipher.auth_tag = [slot.drill(:key_params, :tag)].pack 'H*'
     decipher.padding = 0
@@ -190,19 +193,16 @@ def getpass(prompt)
 end
 
 #
-# Decrypt a vault file.
-#
-# Accept vault filename as a command-line argument, and decrypt it with password from user input.
+# Decrypt vault with password from user input.
 # If successful, return plaintext vault data as JSON String.
 #
 # @param [String] filename Vault file to decrypt
 #
 # @return [String] Plaintext vault as JSON String
 #
-def decrypt_vault
-  terminate "Usage: #{$PROGRAM_NAME} <filename>" if ARGV.length != 1
+def decrypt_vault(filename)
   begin
-    obj = parse_json File.read(ARGV[0], :encoding => 'utf-8')
+    obj = parse_json File.read(filename, :encoding => 'utf-8')
   rescue Errno::ENOENT => e
     terminate e.to_s
   end
@@ -217,8 +217,45 @@ def decrypt_vault
   plain_text
 end
 
+#
+# Accept vault filename as a command-line argument, and optionally output format.
+# Decrypt the vault and write its contents to $stdout in specified output format.
+#
+# @param [String] filename Vault file to decrypt
+# @param [String] format Output format (Default: json)
+#
 def main
-  $stdout.write decrypt_vault
+  formats = %i[json csv pretty]
+  options = { :format => :json }
+
+  parser = OptionParser.new do |opts|
+    opts.banner = "Usage: #{$PROGRAM_NAME} <filename> [options]"
+    opts.on('-f FORMAT', '--format FORMAT', formats,
+            "Plaintext vault output format; pick one from #{formats.map(&:to_s)}") do |f|
+      options[:format] = f
+    end
+    opts.on('-h', '--help', 'Show this message') do
+      puts opts
+      exit 0
+    end
+  end
+
+  begin
+    parser.parse! ARGV
+    raise StandardError,  "invalid number of arguments: expected 1, got #{ARGV.length}" if ARGV.length != 1
+  rescue StandardError => e
+    terminate "#{e}\n#{parser}"
+  end
+
+  plain_text = decrypt_vault(ARGV[0])
+  $stdout.write case options[:format]
+                when :pretty
+                  beautify entries_to_csv plain_text
+                when :csv
+                  entries_to_csv plain_text
+                else
+                  plain_text
+                end
 end
 
 main if __FILE__ == $PROGRAM_NAME
