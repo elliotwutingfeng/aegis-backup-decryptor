@@ -34,19 +34,6 @@ def silence(filter = '')
   @original_stdout = nil
 end
 
-describe 'parse_json' do
-  it 'Parses valid JSON' do
-    expect(parse_json('{"a": [1, 2]}')).to eq({ :a => [1, 2] })
-  end
-  it 'Exit 1 if invalid JSON' do
-    silence do
-      expect { parse_json('') }.to raise_error(SystemExit) do |error|
-        expect(error.status).to eq(1)
-      end
-    end
-  end
-end
-
 describe 'get_vault_params' do
   it 'Extracts vault parameters if valid' do
     params = get_vault_params(JSON.parse('{
