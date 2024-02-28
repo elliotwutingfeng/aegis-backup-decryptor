@@ -30,6 +30,12 @@ describe 'parse_json' do
   end
 end
 
+describe 'remove_fields' do
+  it 'Removes fields from CSV String correctly' do
+    expect(CSV.parse(remove_fields("a,b,c\n1,2,3", %w[a c]), :headers => true).headers).to eq ['b']
+  end
+end
+
 describe 'beautify' do
   it 'Pretty prints plain text vault as a CSV-like String padded with spaces' do
     expect(beautify(entries_to_csv(File.read('test/plaintext_test.json',

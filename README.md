@@ -165,6 +165,26 @@ b25f8815-007f-40f7-a700-ce058ac05435  hotp   Mason     WWE         5VAML3X35THCE
 5b11ae3b-6fc3-4d46-8ca7-cf0aea7de920  steam  Sophia    Boeing      JRZCL47CMXVOQMNPZR2F7J4RGI  30           5                          SHA1
 ```
 
+### Hiding unwanted fields
+
+When the `-f / --format` option is set to `csv` or `pretty`, you can use the `-e / --except` option to hide unwanted fields.
+
+```bash
+# Enter the above password when prompted
+ruby lib/decrypt.rb test/encrypted_test.json -f pretty -e icon,info.counter,uuid
+```
+
+```csv
+type   name      issuer      info.secret                 info.period  info.digits  info.algo
+totp   Mason     Deno        4SJHB4GSD43FZBAI7C2HLRJGPQ  30           6            SHA1
+totp   James     SPDX        5OM4WOOGPLQEF6UGN3CPEOOLWU  20           7            SHA256
+totp   Elijah    Airbnb      7ELGJSGXNCCTV3O6LKJWYFV2RA  50           8            SHA512
+hotp   James     Issuu       YOOMIXWS5GN6RTBPUFFWKTW5M4               6            SHA1
+hotp   Benjamin  Air Canada  KUVJJOM753IHTNDSZVCNKL7GII               7            SHA256
+hotp   Mason     WWE         5VAML3X35THCEBVRLV24CGBKOY               8            SHA512
+steam  Sophia    Boeing      JRZCL47CMXVOQMNPZR2F7J4RGI  30           5            SHA1
+```
+
 ## Testing
 
 ```bash
