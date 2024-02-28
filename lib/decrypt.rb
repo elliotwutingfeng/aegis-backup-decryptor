@@ -23,10 +23,24 @@ require_relative 'pretty'
 
 ENCRYPTION_CIPHER = 'aes-256-gcm'.freeze
 
+#
 # DrillPatch provides method `drill` similar to Hash.dig
 # but returns nil instead of raising TypeError if it encounters
 # an intermediate step that is not a Hash.
+#
 module DrillPatch
+  #
+  # Traverse a nested hash to access a value.
+  #
+  # @param [Array<Object>] args A list of keys to traverse the nested hash
+  # @return [Object, nil] The value found at the specified nested key path, or `nil` if not found
+  #
+  # @example
+  #   h = { a: { b: { c: 42 } } }
+  #   h.extend(DrillPatch)
+  #   h.drill(:a, :b, :c) #=> 42
+  #   h.drill(:a, :b, :c, :d) #=> nil
+  #
   def drill(*args)
     node = self
     args.each do |arg|
