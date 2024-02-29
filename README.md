@@ -167,11 +167,11 @@ b25f8815-007f-40f7-a700-ce058ac05435  hotp   Mason     WWE         5VAML3X35THCE
 
 ### Hiding unwanted fields
 
-When the `-f / --format` option is set to `csv` or `pretty`, you can use the `-e / --except` option to hide unwanted fields.
+When the `-f / --format` option is set to `csv` or `pretty`, you can use the `-e / --except` option to hide unwanted fields. Non-existent fields are silently ignored.
 
 ```bash
 # Enter the above password when prompted
-ruby lib/decrypt.rb test/encrypted_test.json -f pretty -e icon,info.counter,uuid
+ruby lib/decrypt.rb test/encrypted_test.json -f pretty -e icon,icon_mime,favorite,note,info.counter,uuid
 ```
 
 ```csv
