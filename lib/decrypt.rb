@@ -145,6 +145,7 @@ def derive_master_key(password, password_slots)
                                                  :p => slot[:p], :length => 32)
     decipher.iv = [slot.drill(:key_params, :nonce)].pack 'H*'
     decipher.auth_tag = [slot.drill(:key_params, :tag)].pack 'H*'
+    decipher.auth_data = ''
     decipher.padding = 0
 
     begin
@@ -172,6 +173,7 @@ def decrypt_ciphertext(cipher_text, master_key, iv, auth_tag)
   decipher.key = master_key
   decipher.iv = iv
   decipher.auth_tag = auth_tag
+  decipher.auth_data = ''
   decipher.padding = 0
 
   decipher.update(cipher_text) + decipher.final
