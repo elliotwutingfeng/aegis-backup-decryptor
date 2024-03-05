@@ -2,7 +2,7 @@ AllCops:
     NewCops: enable
     TargetRubyVersion: 2.0
 Metrics/AbcSize:
-    Max: 35
+    Max: 26
 Metrics/BlockLength:
     Max: 53
 Metrics/CyclomaticComplexity:
@@ -11,6 +11,8 @@ Metrics/MethodLength:
     Max: 35
 Naming/MethodParameterName:
     Enabled: false
+Metrics/ParameterLists:
+    Max: 7
 Metrics/PerceivedComplexity:
     Max: 12
 Naming/VariableNumber:
