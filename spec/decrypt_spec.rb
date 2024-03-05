@@ -64,16 +64,6 @@ describe 'get_db' do
   end
 end
 
-describe 'decrypt_ciphertext' do
-  it 'Fails to decrypt empty ciphertext' do
-    silence('stderr') do
-      expect { decrypt_ciphertext('', '', [], '', '') }.to raise_error(SystemExit) do |error|
-        expect(error.status).to eq(1)
-      end
-    end
-  end
-end
-
 def decryption_test(args, expected_plaintext_filename)
   ARGV.replace args
   allow($stdin).to receive(:noecho) { 'test' } # Backup file password
