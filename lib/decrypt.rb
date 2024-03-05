@@ -16,12 +16,10 @@
 
 require 'base64'
 require 'io/console'
-require 'openssl'
 require 'optparse'
 
+require_relative 'crypto'
 require_relative 'pretty'
-
-ENCRYPTION_CIPHER = 'aes-256-gcm'.freeze
 
 #
 # DrillPatch provides method `drill` similar to Hash.dig
@@ -70,7 +68,7 @@ end
 #
 # @param [Hash] obj JSON Hash
 #
-# @return [Array] Array of Hash where each Hash may contain parameters needed to derive the master key
+# @return [Array] Array of Hash where each Hash may contain parameters needed to decrypt the master key
 #
 def extract_password_slots(obj)
   assert_is_hash(obj)
@@ -104,79 +102,10 @@ end
 #
 def get_db(obj)
   assert_is_hash(obj)
+  terminate 'Invalid vault file. No db found.' unless obj.key?(:db)
   db = obj[:db]
-  terminate 'Invalid vault file. No db found.' unless db.is_a? String
+  terminate 'Invalid vault file. db is not a String.' unless db.is_a? String
   Base64.strict_decode64 db
-end
-
-#
-# Extract AES-GCM initialization vector and AES-GCM authentication tag from `obj` JSON Hash.
-#
-# @param [Hash] obj JSON Hash
-#
-# @return [Hash] AES-GCM initialization vector and authentication tag
-#
-def get_vault_params(obj)
-  assert_is_hash(obj)
-
-  iv = obj.drill(:header, :params, :nonce)
-  terminate 'Invalid vault file. No initialization vector found.' unless iv.is_a? String
-
-  auth_tag = obj.drill(:header, :params, :tag)
-  terminate 'Invalid vault file. No authentication tag found.' unless auth_tag.is_a? String
-
-  { :iv => [iv].pack('H*'), :auth_tag => [auth_tag].pack('H*') }
-end
-
-#
-# Derive the vault master key by trying out `password`
-# on all `password_slots` until one succeeds.
-#
-# @param [String] password Backup file password as plaintext
-# @param [Array] password_slots Array of Hash where each Hash may contain parameters needed to derive the master key
-#
-# @return [String] Derived master key as bytes
-#
-def derive_master_key(password, password_slots)
-  password_slots.each do |slot|
-    decipher = OpenSSL::Cipher.new ENCRYPTION_CIPHER
-    decipher.decrypt
-    decipher.key = OpenSSL::KDF.scrypt(password, :salt => [slot[:salt]].pack('H*'), :N => slot[:n], :r => slot[:r],
-                                                 :p => slot[:p], :length => 32)
-    decipher.iv = [slot.drill(:key_params, :nonce)].pack 'H*'
-    decipher.auth_tag = [slot.drill(:key_params, :tag)].pack 'H*'
-    decipher.auth_data = ''
-    decipher.padding = 0
-
-    begin
-      return decipher.update([slot[:key]].pack('H*')) + decipher.final
-    rescue OpenSSL::Cipher::CipherError
-      nil
-    end
-  end
-  terminate 'Failed to derive master key. Wrong password?'
-end
-
-#
-# Decrypt `cipher_text` and return the plaintext result as String
-#
-# @param [String] cipher_text Encrypted text as bytes to be decrypted
-# @param [String] master_key `cipher_text`'s master key as bytes
-# @param [String] iv AES-GCM initialization vector as bytes
-# @param [String] auth_tag AES-GCM authentication tag as bytes
-#
-# @return [String] Decrypted `cipher_text`
-#
-def decrypt_ciphertext(cipher_text, master_key, iv, auth_tag)
-  decipher = OpenSSL::Cipher.new ENCRYPTION_CIPHER
-  decipher.decrypt
-  decipher.key = master_key
-  decipher.iv = iv
-  decipher.auth_tag = auth_tag
-  decipher.auth_data = ''
-  decipher.padding = 0
-
-  decipher.update(cipher_text) + decipher.final
 end
 
 #
@@ -195,38 +124,34 @@ def getpass(prompt)
 end
 
 #
-# Decrypt vault with password from user input.
-# If successful, return plaintext vault data as JSON String.
+# Parse vault parameters from vault at `filename`.
 #
-# @param [String] filename Vault file to decrypt
+# @param [String] filename Vault filename
 #
-# @return [String] Plaintext vault as JSON String
+# @return [Hash] Vault parameters
 #
-def decrypt_vault(filename)
+def parse_vault_params(filename)
   begin
     obj = parse_json File.read(filename, :encoding => 'utf-8')
   rescue Errno::ENOENT => e
     terminate e.to_s
   end
+  assert_is_hash(obj)
   password_slots = extract_password_slots(obj)
   cipher_text = get_db(obj)
-  iv, auth_tag = get_vault_params(obj).values_at(:iv, :auth_tag)
+  iv = obj.drill(:header, :params, :nonce)
+  terminate 'Invalid vault file. No initialization vector found.' unless iv.is_a? String
+  auth_tag = obj.drill(:header, :params, :tag)
+  terminate 'Invalid vault file. No authentication tag found.' unless auth_tag.is_a? String
+  version = obj.drill(:version)
+  warn 'WARNING: Unsupported vault format version. Decryption may either fail or produce wrong output.' unless
+  version == 1
 
-  password = getpass('Enter Aegis encrypted backup password: ')
-  master_key = derive_master_key(password, password_slots)
-  plain_text = decrypt_ciphertext(cipher_text, master_key, iv, auth_tag)
-  parse_json(plain_text) # Ensure plain_text is valid JSON.
-  plain_text
+  { :password_slots => password_slots, :cipher_text => cipher_text, :iv => [iv].pack('H*'),
+    :auth_tag => [auth_tag].pack('H*') }
 end
 
-#
-# Accept vault filename as a command-line argument, and optionally output format.
-# Decrypt the vault and write its contents to $stdout in specified output format.
-#
-# @param [String] filename Vault file to decrypt
-# @param [String] format Output format (Default: json)
-#
-def main
+def parse_args
   formats = %i[json csv pretty]
   options = { :format => :json, :except => [] }
 
@@ -256,8 +181,24 @@ def main
   rescue StandardError => e
     terminate "#{e}\n#{parser}"
   end
+  options
+end
 
-  plain_text = decrypt_vault(ARGV[0])
+#
+# Accept vault filename as a command-line argument, and optionally output format and fields to exclude.
+# Decrypt the vault and write its contents to $stdout in specified output format.
+#
+# @param [String] filename Vault file to decrypt
+# @param [String] format Output format (Default: json)
+#
+def main
+  options = parse_args
+  vault_params = parse_vault_params ARGV[0]
+  vault_params[:password] = getpass('Enter Aegis encrypted backup password: ')
+  plain_text, = decrypt_ciphertext(vault_params[:cipher_text], vault_params[:password], vault_params[:password_slots],
+                                   vault_params[:iv], vault_params[:auth_tag])
+  parse_json(plain_text) # Ensure plain_text is valid JSON.
+
   $stdout.write case options[:format]
                 when :pretty
                   beautify remove_fields(entries_to_csv(plain_text), options[:except])

@@ -14,8 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-require 'spec_helper'
 require 'decrypt'
+require 'spec_helper'
 
 ENCRYPTED_TEST_VAULT = 'test/encrypted_test.json'.freeze
 
@@ -32,32 +32,6 @@ def silence(filter = '')
   $stdout = @original_stdout
   @original_stderr = nil
   @original_stdout = nil
-end
-
-describe 'get_vault_params' do
-  it 'Extracts vault parameters if valid' do
-    params = get_vault_params(JSON.parse('{
-      "header": {"params": {"nonce":"1", "tag": "2"}}
-    }', :symbolize_names => true))
-    expected = { :iv => ['1'].pack('H*'), :auth_tag => ['2'].pack('H*') }
-    params.each do |k, v|
-      expect(v).to eq(expected[k])
-    end
-  end
-  it 'Exit 1 if vault parameters are invalid' do
-    test_vectors = ['{}',
-                    '{"header":{"params":{"nonce":1,"tag":"2"}}}',
-                    '{"header":{"params":{"nonce":"1","tag":2}}}'].map do |s|
-      JSON.parse(s, :symbolize_names => true)
-    end
-    silence do
-      test_vectors.each do |content|
-        expect { get_vault_params(content) }.to raise_error(SystemExit) do |error|
-          expect(error.status).to eq(1)
-        end
-      end
-    end
-  end
 end
 
 describe 'extract_password_slots' do
