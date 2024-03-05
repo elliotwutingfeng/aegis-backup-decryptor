@@ -191,5 +191,5 @@ steam  Sophia    Boeing      JRZCL47CMXVOQMNPZR2F7J4RGI  30           5         
 # The test suite requires Ruby 2.5 or newer
 gem install bundler
 bundle install
-bundle exec rspec
+bundle exec rspec -r spec_helper
 ```
