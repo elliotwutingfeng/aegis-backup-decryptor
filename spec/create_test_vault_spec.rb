@@ -16,7 +16,7 @@
 
 require 'create_test_vault'
 require 'crypto'
-require 'json'
+require 'pretty'
 require 'spec_helper'
 
 describe 'encrypt_vault' do
@@ -31,8 +31,14 @@ describe 'encrypt_vault' do
 
     encrypted_vault_json = encrypt_vault(expected_plain_text, password, [salt].pack('H*'),
                                          vault_key, [password_nonce].pack('H*'),
-                                         [vault_nonce].pack('H*'), uuid)
-    encrypted_vault = JSON.parse(encrypted_vault_json, :symbolize_names => true)
+                                         [vault_nonce].pack('H*'), uuid) # Pretty printed
+    encrypted_vault = parse_json(encrypted_vault_json)
+    compacted_encrypted_vault_json = encrypted_vault.to_json
+
+    expected_vault_json = parse_json(File.read('test/encrypted_test.json', :encoding => 'utf-8')).to_json # Compacted
+
+    expect(compacted_encrypted_vault_json).to eq expected_vault_json
+
     # Now decrypt it and check that its plaintext form matches the expected plaintext.
     plain_text, = decrypt_ciphertext(get_db(encrypted_vault), password, encrypted_vault[:header][:slots],
                                      [encrypted_vault[:header][:params][:nonce]].pack('H*'),

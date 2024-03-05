@@ -15,6 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 require 'base64'
+require 'json'
 
 require_relative 'crypto'
 
@@ -53,32 +54,32 @@ def encrypt_vault(plain_text, password, salt, vault_key, password_nonce, vault_n
   # Encrypt the vault_key using the meta_key
   encrypted_vault_key, password_tag = aes_gcm(Base64.strict_decode64(vault_key), meta_key, password_nonce, true)
 
-  {
-    :version => 1,
-    :header => {
-      :slots => [
-        {
-          :type => 1,
-          :uuid => uuid,
-          :key => encrypted_vault_key.unpack1('H*'),
-          :key_params => {
-            :nonce => password_nonce.unpack1('H*'),
-            :tag => password_tag.unpack1('H*')
-          },
-          :n => n,
-          :r => r,
-          :p => p,
-          :salt => salt.unpack1('H*'),
-          :repaired => true
-        }
-      ],
-      :params => {
-        :nonce => vault_nonce.unpack1('H*'),
-        :tag => vault_tag.unpack1('H*')
-      }
-    },
-    :db => Base64.strict_encode64(encrypted_plain_text)
-  }.to_json
+  JSON.pretty_generate({
+                         :version => 1,
+                         :header => {
+                           :slots => [
+                             {
+                               :type => 1,
+                               :uuid => uuid,
+                               :key => encrypted_vault_key.unpack1('H*'),
+                               :key_params => {
+                                 :nonce => password_nonce.unpack1('H*'),
+                                 :tag => password_tag.unpack1('H*')
+                               },
+                               :n => n,
+                               :r => r,
+                               :p => p,
+                               :salt => salt.unpack1('H*'),
+                               :repaired => true
+                             }
+                           ],
+                           :params => {
+                             :nonce => vault_nonce.unpack1('H*'),
+                             :tag => vault_tag.unpack1('H*')
+                           }
+                         },
+                         :db => Base64.strict_encode64(encrypted_plain_text)
+                       }, :indent => '    ')
 rescue ArgumentError => e
   terminate "Failed to encrypt vault. #{e.instance_of?(ArgumentError) ? e.message : 'Invalid parameters?'}"
 end
