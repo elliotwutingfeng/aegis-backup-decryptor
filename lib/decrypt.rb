@@ -144,7 +144,7 @@ def parse_vault_params(filename)
   auth_tag = obj.drill(:header, :params, :tag)
   terminate 'Invalid vault file. No authentication tag found.' unless auth_tag.is_a? String
   version = obj.drill(:version)
-  warn 'WARNING: Vault format version is not 1. Decryption may either fail completely or produce wrong results.' unless
+  warn 'WARNING: Unsupported vault format version. Decryption may either fail or produce wrong output.' unless
   version == 1
 
   { :password_slots => password_slots, :cipher_text => cipher_text, :iv => [iv].pack('H*'),
