@@ -51,11 +51,6 @@ module DrillPatch
 end
 Hash.include DrillPatch
 
-def terminate(message)
-  warn message
-  exit 1
-end
-
 def assert_is_hash(obj)
   return if obj.is_a? Hash
 
