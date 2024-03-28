@@ -182,18 +182,18 @@ When the `-f / --format` option is set to `csv` or `pretty`, you can use the `-e
 
 ```bash
 # Enter the above password when prompted
-ruby lib/decrypt.rb test/encrypted_test.json -f pretty -e icon,icon_mime,favorite,note,info.counter,uuid
+ruby lib/decrypt.rb test/encrypted_test.json -f pretty -e icon,icon_mime,icon_hash,favorite,note,uuid
 ```
 
 ```csv
-type   name      issuer      info.secret                 info.period  info.digits  info.algo
-totp   Mason     Deno        4SJHB4GSD43FZBAI7C2HLRJGPQ  30           6            SHA1
-totp   James     SPDX        5OM4WOOGPLQEF6UGN3CPEOOLWU  20           7            SHA256
-totp   Elijah    Airbnb      7ELGJSGXNCCTV3O6LKJWYFV2RA  50           8            SHA512
-hotp   James     Issuu       YOOMIXWS5GN6RTBPUFFWKTW5M4               6            SHA1
-hotp   Benjamin  Air Canada  KUVJJOM753IHTNDSZVCNKL7GII               7            SHA256
-hotp   Mason     WWE         5VAML3X35THCEBVRLV24CGBKOY               8            SHA512
-steam  Sophia    Boeing      JRZCL47CMXVOQMNPZR2F7J4RGI  30           5            SHA1
+type   name      issuer      info.secret                 info.period  info.digits  info.counter  info.algo
+totp   Mason     Deno        4SJHB4GSD43FZBAI7C2HLRJGPQ  30           6                          SHA1
+totp   James     SPDX        5OM4WOOGPLQEF6UGN3CPEOOLWU  20           7                          SHA256
+totp   Elijah    Airbnb      7ELGJSGXNCCTV3O6LKJWYFV2RA  50           8                          SHA512
+hotp   James     Issuu       YOOMIXWS5GN6RTBPUFFWKTW5M4               6            1             SHA1
+hotp   Benjamin  Air Canada  KUVJJOM753IHTNDSZVCNKL7GII               7            50            SHA256
+hotp   Mason     WWE         5VAML3X35THCEBVRLV24CGBKOY               8            10300         SHA512
+steam  Sophia    Boeing      JRZCL47CMXVOQMNPZR2F7J4RGI  30           5                          SHA1
 ```
 
 ## Testing
