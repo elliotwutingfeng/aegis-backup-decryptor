@@ -45,6 +45,7 @@ describe 'encrypt_vault' do
                                      [encrypted_vault[:header][:params][:tag]].pack('H*'))
     expect(plain_text).to eq expected_plain_text
   end
+
   it 'Fails to encrypt empty vault' do
     silence('stderr') do
       expect { encrypt_vault('', '', '', '', '', '', '') }.to raise_error(SystemExit) do |error|

@@ -66,7 +66,7 @@ end
 
 def decryption_test(args, expected_plaintext_filename)
   ARGV.replace args
-  allow($stdin).to receive(:noecho) { 'test' } # Backup file password
+  allow($stdin).to receive(:noecho).and_return('test') # Backup file password
   output = nil
   expect($stdout).to receive(:write) { |arg| output = arg }
   silence('stderr') do
@@ -84,24 +84,27 @@ describe 'main' do
       decryption_test([ENCRYPTED_TEST_VAULT, flag, 'pretty'], 'test/pretty_test.txt')
     end
   end
+
   it 'Wrong password -> Decryption failure' do
     ARGV.replace [ENCRYPTED_TEST_VAULT]
-    allow($stdin).to receive(:noecho) { '' }
+    allow($stdin).to receive(:noecho).and_return('')
     silence do
       expect { main }.to raise_error(SystemExit) do |error|
         expect(error.status).to eq(1)
       end
     end
   end
+
   it 'No such file or directory -> SystemExit' do
     ARGV.replace ["#{ENCRYPTED_TEST_VAULT}_that_does_not_exist"]
-    allow($stdin).to receive(:noecho) { '' }
+    allow($stdin).to receive(:noecho).and_return('')
     silence do
       expect { main }.to raise_error(SystemExit) do |error|
         expect(error.status).to eq(1)
       end
     end
   end
+
   it 'Accepts exactly 1 argument' do
     test_vectors = [[], [ENCRYPTED_TEST_VAULT, 'another'], [ENCRYPTED_TEST_VAULT, 'yet another']]
     silence do
@@ -113,6 +116,7 @@ describe 'main' do
       end
     end
   end
+
   it 'Terminates if `--format` is `json` and `--except` fields are included' do
     silence do
       ARGV.replace [ENCRYPTED_TEST_VAULT, '-f', 'json', '-e', 'field']
@@ -121,6 +125,7 @@ describe 'main' do
       end
     end
   end
+
   it 'Shows help' do
     ARGV.replace ['--help']
     output = nil
@@ -128,6 +133,6 @@ describe 'main' do
     expect { main }.to raise_error(SystemExit) do |error|
       expect(error.status).to eq(0)
     end
-    expect(output.start_with?('Usage')).to eq true
+    expect(output.start_with?('Usage')).to be true
   end
 end
