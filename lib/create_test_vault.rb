@@ -81,5 +81,5 @@ def encrypt_vault(plain_text, password, salt, vault_key, password_nonce, vault_n
                          :db => Base64.strict_encode64(encrypted_plain_text)
                        }, :indent => '    ')
 rescue ArgumentError => e
-  terminate "Failed to encrypt vault. #{e.instance_of?(ArgumentError) ? e.message : 'Invalid parameters?'}"
+  abort "Failed to encrypt vault. #{e.instance_of?(ArgumentError) ? e.message : 'Invalid parameters?'}"
 end

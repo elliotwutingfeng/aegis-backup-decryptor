@@ -16,10 +16,8 @@
 
 require 'openssl'
 
-require_relative 'pretty'
-
-terminate 'LibreSSL is not supported by this program.' if OpenSSL::OPENSSL_LIBRARY_VERSION.downcase.include? 'libressl'
-terminate 'Scrypt support is missing.' if defined?(OpenSSL::KDF).nil? || !OpenSSL::KDF.methods.include?(:scrypt)
+abort 'LibreSSL is not supported by this program.' if OpenSSL::OPENSSL_LIBRARY_VERSION.downcase.include? 'libressl'
+abort 'Scrypt support is missing.' if defined?(OpenSSL::KDF).nil? || !OpenSSL::KDF.methods.include?(:scrypt)
 
 ENCRYPTION_CIPHER = 'aes-256-gcm'.freeze
 
@@ -59,7 +57,7 @@ def decrypt_master_key(password, password_slots)
       nil
     end
   end
-  terminate 'Failed to decrypt master key. Wrong password?'
+  abort 'Failed to decrypt master key. Wrong password?'
 end
 
 #
@@ -103,5 +101,5 @@ def decrypt_ciphertext(cipher_text, password, password_slots, iv, auth_tag)
   master_key = decrypt_master_key(password, password_slots)
   aes_gcm(cipher_text, master_key, iv, encrypt, auth_tag)
 rescue OpenSSL::Cipher::CipherError, ArgumentError => e
-  terminate "Failed to decrypt vault. #{e.instance_of?(ArgumentError) ? e.message : 'Vault may be corrupted.'}"
+  abort "Failed to decrypt vault. #{e.instance_of?(ArgumentError) ? e.message : 'Vault may be corrupted.'}"
 end

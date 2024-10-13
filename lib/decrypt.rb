@@ -54,7 +54,7 @@ Hash.include DrillPatch
 def assert_is_hash(obj)
   return if obj.is_a? Hash
 
-  terminate 'Invalid vault file. Top-level is not Hash.'
+  abort 'Invalid vault file. Top-level is not Hash.'
 end
 
 #
@@ -68,7 +68,7 @@ end
 def extract_password_slots(obj)
   assert_is_hash(obj)
   slots = obj.drill(:header, :slots)
-  terminate 'Invalid vault file. No valid password slots found.' unless slots.is_a? Array
+  abort 'Invalid vault file. No valid password slots found.' unless slots.is_a? Array
 
   password_slots = slots.select do |slot|
     next if slot.drill(:type) != 1
@@ -83,7 +83,7 @@ def extract_password_slots(obj)
     true
   end
 
-  terminate 'Invalid vault file. No valid password slots found.' if password_slots.empty?
+  abort 'Invalid vault file. No valid password slots found.' if password_slots.empty?
 
   password_slots
 end
@@ -97,9 +97,9 @@ end
 #
 def get_db(obj)
   assert_is_hash(obj)
-  terminate 'Invalid vault file. No db found.' unless obj.key?(:db)
+  abort 'Invalid vault file. No db found.' unless obj.key?(:db)
   db = obj[:db]
-  terminate 'Invalid vault file. db is not a String.' unless db.is_a? String
+  abort 'Invalid vault file. db is not a String.' unless db.is_a? String
   Base64.strict_decode64 db
 end
 
@@ -129,15 +129,15 @@ def parse_vault_params(filename)
   begin
     obj = parse_json File.read(filename, :encoding => 'utf-8')
   rescue Errno::ENOENT => e
-    terminate e.to_s
+    abort e.to_s
   end
   assert_is_hash(obj)
   password_slots = extract_password_slots(obj)
   cipher_text = get_db(obj)
   iv = obj.drill(:header, :params, :nonce)
-  terminate 'Invalid vault file. No initialization vector found.' unless iv.is_a? String
+  abort 'Invalid vault file. No initialization vector found.' unless iv.is_a? String
   auth_tag = obj.drill(:header, :params, :tag)
-  terminate 'Invalid vault file. No authentication tag found.' unless auth_tag.is_a? String
+  abort 'Invalid vault file. No authentication tag found.' unless auth_tag.is_a? String
   version = obj.drill(:version)
   warn 'WARNING: Unsupported vault format version. Decryption may either fail or produce wrong output.' unless
   version == 1
@@ -174,7 +174,7 @@ def parse_args
             'hiding fields is only supported for `csv` and `pretty` formats'
     end
   rescue StandardError => e
-    terminate "#{e}\n#{parser}"
+    abort "#{e}\n#{parser}"
   end
   options
 end
