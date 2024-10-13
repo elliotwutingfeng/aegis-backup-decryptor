@@ -18,7 +18,8 @@ require 'openssl'
 
 require_relative 'pretty'
 
-terminate 'LibreSSL is not supported.' if OpenSSL::OPENSSL_LIBRARY_VERSION.downcase.include? 'libressl'
+terminate 'LibreSSL is not supported by this program.' if OpenSSL::OPENSSL_LIBRARY_VERSION.downcase.include? 'libressl'
+terminate 'Scrypt support is missing.' if defined?(OpenSSL::KDF).nil? || !OpenSSL::KDF.methods.include?(:scrypt)
 
 ENCRYPTION_CIPHER = 'aes-256-gcm'.freeze
 
@@ -75,11 +76,7 @@ end
 #
 def aes_gcm(text, master_key, iv, encrypt, auth_tag = nil)
   cipher = OpenSSL::Cipher.new ENCRYPTION_CIPHER
-  if encrypt
-    cipher.encrypt
-  else
-    cipher.decrypt
-  end
+  encrypt ? cipher.encrypt : cipher.decrypt
   cipher.key = master_key
   cipher.iv = iv
   cipher.auth_tag = auth_tag unless encrypt
