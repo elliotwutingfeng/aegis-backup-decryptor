@@ -11,13 +11,13 @@ This application is neither affiliated with Beem Development nor Aegis Authentic
 ## Requirements
 
 - **Ruby:** 2.5+/3.0+, no external gems needed
-- **OpenSSL:** 1.0.2+/3.0+
+- **OpenSSL:** 1.1+/3.0+
   - In the terminal, run the following to view your Ruby interpreter's [OpenSSL](https://openssl.org) version
 
     ```bash
     ruby -e "require 'openssl'; puts OpenSSL::OPENSSL_LIBRARY_VERSION"
     # Example output
-    # OpenSSL 3.1.1 30 May 2023
+    # OpenSSL 3.3.2 3 Sep 2024
     ```
 
   - [LibreSSL](https://libressl.org) is not supported

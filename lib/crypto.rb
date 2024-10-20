@@ -17,7 +17,7 @@
 require 'openssl'
 
 abort 'LibreSSL is not supported by this program.' if OpenSSL::OPENSSL_LIBRARY_VERSION.downcase.include? 'libressl'
-abort 'Scrypt support is missing.' if defined?(OpenSSL::KDF).nil? || !OpenSSL::KDF.methods.include?(:scrypt)
+abort 'Scrypt support is missing.' if defined?(OpenSSL::KDF).nil? || !OpenSSL::KDF.respond_to?(:scrypt)
 
 ENCRYPTION_CIPHER = 'aes-256-gcm'.freeze
 
