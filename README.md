@@ -17,7 +17,7 @@ This application is neither affiliated with Beem Development nor Aegis Authentic
     ```bash
     ruby -e "require 'openssl'; puts OpenSSL::OPENSSL_LIBRARY_VERSION"
     # Example output
-    # OpenSSL 3.3.2 3 Sep 2024
+    # OpenSSL 3.4.0 22 Oct 2024
     ```
 
   - [LibreSSL](https://libressl.org) is not supported
@@ -210,8 +210,15 @@ steam  Sophia    Boeing      JRZCL47CMXVOQMNPZR2F7J4RGI  30           5         
 ## Testing
 
 ```bash
-# The test suite requires Ruby 2.5 or newer
 gem install bundler
 bundle install
 bundle exec rspec -r spec_helper
 ```
+
+## Vendoring Bundled Gems
+
+```bash
+gem unpack csv --target=vendor/gems/
+```
+
+Then update gem versions in Gemfile, and run `bundle install`.

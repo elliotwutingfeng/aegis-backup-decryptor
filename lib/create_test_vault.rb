@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-require 'base64'
 require 'json'
 
 require_relative 'crypto'
@@ -46,13 +45,13 @@ def encrypt_vault(plain_text, password, salt, vault_key, password_nonce, vault_n
   length = 32
 
   # Encrypt the plain_text
-  encrypted_plain_text, vault_tag = aes_gcm(plain_text, Base64.strict_decode64(vault_key), vault_nonce, true)
+  encrypted_plain_text, vault_tag = aes_gcm(plain_text, vault_key.unpack1('m0'), vault_nonce, true)
 
   # Derive the meta_key
   meta_key = derive_key(password, salt, n, r, p, length)
 
   # Encrypt the vault_key using the meta_key
-  encrypted_vault_key, password_tag = aes_gcm(Base64.strict_decode64(vault_key), meta_key, password_nonce, true)
+  encrypted_vault_key, password_tag = aes_gcm(vault_key.unpack1('m0'), meta_key, password_nonce, true)
 
   JSON.pretty_generate({
                          :version => 1,
@@ -78,7 +77,7 @@ def encrypt_vault(plain_text, password, salt, vault_key, password_nonce, vault_n
                              :tag => vault_tag.unpack1('H*')
                            }
                          },
-                         :db => Base64.strict_encode64(encrypted_plain_text)
+                         :db => [encrypted_plain_text].pack('m0')
                        }, :indent => '    ')
 rescue ArgumentError => e
   abort "Failed to encrypt vault. #{e.instance_of?(ArgumentError) ? e.message : 'Invalid parameters?'}"

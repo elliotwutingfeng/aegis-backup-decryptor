@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-require 'base64'
 require 'io/console'
 require 'optparse'
 
@@ -100,7 +99,7 @@ def get_db(obj)
   abort 'Invalid vault file. No db found.' unless obj.key?(:db)
   db = obj[:db]
   abort 'Invalid vault file. db is not a String.' unless db.is_a? String
-  Base64.strict_decode64 db
+  db.unpack1('m0')
 end
 
 #
