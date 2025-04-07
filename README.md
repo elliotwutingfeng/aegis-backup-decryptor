@@ -218,6 +218,7 @@ bundle exec rspec -r spec_helper
 ## Vendoring Bundled Gems
 
 ```bash
+rm -rf vendor/
 gem unpack csv --target=vendor/gems/
 ```
 
