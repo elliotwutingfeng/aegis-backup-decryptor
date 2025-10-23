@@ -219,7 +219,7 @@ bundle exec rspec -r spec_helper
 
 ```bash
 rm -rf vendor/
-gem unpack csv --target=vendor/gems/
+gem unpack csv -v 3.3.3 --target=vendor/gems/
 ```
 
 Then update gem versions in Gemfile, and run `bundle install`.
