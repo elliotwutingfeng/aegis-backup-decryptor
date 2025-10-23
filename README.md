@@ -10,7 +10,7 @@ This application is neither affiliated with Beem Development nor Aegis Authentic
 
 ## Requirements
 
-- **Ruby:** 2.5+/3.0+, no external gems needed
+- **Ruby:** 2.6+/3.0+, no external gems needed
 - **OpenSSL:** 1.1+/3.0+
   - In the terminal, run the following to view your Ruby interpreter's [OpenSSL](https://openssl.org) version
 
