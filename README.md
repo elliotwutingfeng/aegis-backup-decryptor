@@ -211,7 +211,7 @@ steam  Sophia    Boeing      JRZCL47CMXVOQMNPZR2F7J4RGI  30           5         
 
 ```bash
 gem install bundler
-bundle install --full-index
+bundle install
 bundle exec rspec -r spec_helper
 ```
 
