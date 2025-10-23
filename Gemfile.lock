@@ -1,7 +1,7 @@
 PATH
   remote: vendor/gems/csv-3.3.3
   specs:
-    csv (3.3.3)
+    csv (3.3.5)
 
 GEM
   remote: https://rubygems.org/
@@ -14,7 +14,7 @@ GEM
     lint_roller (1.1.0)
     parallel (1.27.0)
     parser (3.3.9.0)
-      ast (>= 2.4.1)
+      ast (~> 2.4.1)
       racc
     prism (1.5.2)
     racc (1.8.1)
@@ -47,7 +47,7 @@ GEM
       unicode-display_width (>= 2.4.0, < 4.0)
     rubocop-ast (1.47.1)
       parser (>= 3.3.7.2)
-      prism (>= 1.4)
+      prism (~> 1.4)
     rubocop-rspec (3.7.0)
       lint_roller (~> 1.1)
       rubocop (~> 1.72, >= 1.72.1)
@@ -69,7 +69,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  csv (= 3.3.3)!
+  csv (= 3.3.5)!
   rspec
   rubocop
   rubocop-rspec
