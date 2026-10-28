@@ -10,14 +10,14 @@ This application is neither affiliated with Beem Development nor Aegis Authentic
 
 ## Requirements
 
-- **Ruby:** 2.5+/3.0+, no external gems needed
+- **Ruby:** 2.5+, no external gems needed
 - **OpenSSL:** 1.1+/3.0+
   - In the terminal, run the following to view your Ruby interpreter's [OpenSSL](https://openssl.org) version
 
     ```bash
     ruby -e "require 'openssl'; puts OpenSSL::OPENSSL_LIBRARY_VERSION"
     # Example output
-    # OpenSSL 3.4.0 22 Oct 2024
+    # OpenSSL 3.6.5 29 Sep 2026
     ```
 
   - [LibreSSL](https://libressl.org) is not supported
@@ -219,7 +219,7 @@ bundle exec rspec -r spec_helper
 
 ```bash
 rm -rf vendor/
-gem unpack csv -v 3.3.3 --target=vendor/gems/
+gem unpack csv -v 3.3.5 --target=vendor/gems/
 ```
 
 Then update gem versions in Gemfile, and run `bundle install`.
